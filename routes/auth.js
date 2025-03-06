@@ -36,37 +36,21 @@ router.post('/login', async (req, res) => {
             });
         }
         
-        // Créer la session avec tous les champs nécessaires
+        // Créer la session
         req.session.user = {
             id: user._id,
             email: user.email,
-            username: user.username || 'Admin', // Utiliser username ou une valeur par défaut
-            role: user.role || 'admin' // Utiliser role ou une valeur par défaut
+            username: user.username || 'Admin',
+            role: user.role || 'admin'
         };
         
         console.log('Session utilisateur créée:', req.session.user);
         
-        // Définir un cookie secure en production
-        if (process.env.NODE_ENV === 'production') {
-            req.session.cookie.secure = true;
-        }
-        
-        // Sauvegarder la session et rediriger
-        req.session.save(err => {
-            if (err) {
-                console.error('Erreur sauvegarde session:', err);
-                return res.status(500).json({
-                    status: 'error',
-                    message: 'Erreur lors de la connexion'
-                });
-            }
-            
-            // Rediriger vers le dashboard
-            return res.status(200).json({
-                status: 'success',
-                message: 'Connexion réussie',
-                redirect: '/dashboard'
-            });
+        // Répondre avec un JSON au lieu de rediriger
+        return res.status(200).json({
+            status: 'success',
+            message: 'Connexion réussie',
+            redirect: '/dashboard'
         });
         
     } catch (error) {

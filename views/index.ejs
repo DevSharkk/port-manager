@@ -11,28 +11,14 @@
             <div class="card">
                 <div class="card-body">
                     <h2 class="card-title">Connexion</h2>
-                    <form id="loginForm" method="POST" action="/api/login">
+                    <form id="loginForm" class="mt-4">
                         <div class="mb-3">
-                            <label for="email">Email</label>
-                            <input 
-                                type="email" 
-                                class="form-control" 
-                                id="email" 
-                                name="email" 
-                                value="admin@port.com"
-                                required
-                            >
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
                         </div>
                         <div class="mb-3">
-                            <label for="password">Mot de passe</label>
-                            <input 
-                                type="password" 
-                                class="form-control" 
-                                id="password" 
-                                name="password" 
-                                value="admin123"
-                                required
-                            >
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Connexion</button>
                     </form>
@@ -54,10 +40,12 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: 'same-origin' // Important pour les cookies de session
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Réponse:', data);
         if (data.status === 'success') {
             window.location.href = data.redirect || '/dashboard';
         } else {
