@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <h1>Nouvelle Réservation</h1>
+
+    <form action="/api/reservations" method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="catwayNumber" class="form-label">Numéro de Catway</label>
+            <select class="form-control" id="catwayNumber" name="catwayNumber" required>
+                <% catways.forEach(function(catway) { %>
+                    <option value="<%= catway.catwayNumber %>">
+                        Catway <%= catway.catwayNumber %> (<%= catway.catwayType %>)
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="clientName" class="form-label">Nom du Client</label>
+            <input type="text" class="form-control" id="clientName" name="clientName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="boatName" class="form-label">Nom du Bateau</label>
+            <input type="text" class="form-control" id="boatName" name="boatName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="startDate" class="form-label">Date de début</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="endDate" class="form-label">Date de fin</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Créer</button>
+        <a href="/reservations" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>

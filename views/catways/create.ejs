@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <h1>Nouveau Catway</h1>
+
+    <form id="createCatwayForm" onsubmit="submitForm(event)">
+        <div class="mb-3">
+            <label for="catwayNumber" class="form-label">Numéro</label>
+            <input type="number" class="form-control" id="catwayNumber" name="catwayNumber" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="catwayType" class="form-label">Type</label>
+            <select class="form-control" id="catwayType" name="catwayType" required>
+                <option value="petit">Petit</option>
+                <option value="moyen">Moyen</option>
+                <option value="grand">Grand</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="catwayState" class="form-label">État</label>
+            <select class="form-control" id="catwayState" name="catwayState" required>
+                <option value="disponible">Disponible</option>
+                <option value="occupé">Occupé</option>
+                <option value="maintenance">Maintenance</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Créer</button>
+        <a href="/catways" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<script>
+function submitForm(event) {
+    event.preventDefault();
+    
+    const formData = {
+        catwayNumber: parseInt(document.getElementById('catwayNumber').value),
+        catwayType: document.getElementById('catwayType').value,
+        catwayState: document.getElementById('catwayState').value
+    };
+
+    fetch('/api/catways', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = '/catways'; // Redirection vers la liste des catways
+        } else {
+            throw new Error('Erreur lors de la création');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la création du catway');
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>

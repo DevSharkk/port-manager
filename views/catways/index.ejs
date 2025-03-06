@@ -1,0 +1,62 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestion des Catways</h1>
+        <a href="/catways/create" class="btn btn-primary">Nouveau Catway</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Numéro</th>
+                    <th>Type</th>
+                    <th>État</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% catways.forEach(function(catway) { %>
+                    <tr>
+                        <td><%= catway.catwayNumber %></td>
+                        <td><%= catway.catwayType %></td>
+                        <td><%= catway.catwayState %></td>
+                        <td>
+                            <a href="/catways/<%= catway._id %>/edit" class="btn btn-sm btn-warning">Modifier</a>
+                            <button onclick="deleteCatway('<%= catway.catwayNumber %>')" class="btn btn-sm btn-danger">Supprimer</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function deleteCatway(id) {
+    if(confirm('Êtes-vous sûr de vouloir supprimer ce catway ?')) {
+        fetch(`/api/catways/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                window.location.reload(); // Recharge la page après suppression
+            } else {
+                alert('Erreur lors de la suppression');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la suppression');
+        });
+    }
+}
+</script>
+
+<%- include('../partials/footer') %>

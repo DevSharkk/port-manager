@@ -1,0 +1,64 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Utilisateur connecté</h5>
+                    <p class="card-text">
+                        <%= user.firstName %> <%= user.lastName %><br>
+                        <%= user.email %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Date du jour</h5>
+                    <p class="card-text"><%= new Date().toLocaleDateString('fr-FR') %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Réservations en cours</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Catway</th>
+                    <th>Client</th>
+                    <th>Bateau</th>
+                    <th>Début</th>
+                    <th>Fin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (reservations && reservations.length > 0) { %>
+                    <% reservations.forEach(function(reservation) { %>
+                        <tr>
+                            <td><%= reservation.catwayNumber %></td>
+                            <td><%= reservation.clientName %></td>
+                            <td><%= reservation.boatName %></td>
+                            <td><%= new Date(reservation.startDate).toLocaleDateString('fr-FR') %></td>
+                            <td><%= new Date(reservation.endDate).toLocaleDateString('fr-FR') %></td>
+                            <td>
+                                <a href="/reservations/<%= reservation._id %>" class="btn btn-sm btn-info">Détails</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="6" class="text-center">Aucune réservation trouvée</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

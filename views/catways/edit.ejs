@@ -1,0 +1,64 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <h1>Modifier le Catway</h1>
+
+    <form id="editCatwayForm" onsubmit="submitForm(event)">
+        <div class="mb-3">
+            <label for="catwayNumber" class="form-label">Numéro</label>
+            <input type="number" class="form-control" id="catwayNumber" name="catwayNumber" 
+                   value="<%= catway.catwayNumber %>" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="catwayType" class="form-label">Type</label>
+            <input type="text" class="form-control" id="catwayType" name="catwayType" 
+                   value="<%= catway.catwayType %>" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="catwayState" class="form-label">État</label>
+            <select class="form-control" id="catwayState" name="catwayState" required>
+                <option value="disponible" <%= catway.catwayState === 'disponible' ? 'selected' : '' %>>Disponible</option>
+                <option value="occupé" <%= catway.catwayState === 'occupé' ? 'selected' : '' %>>Occupé</option>
+                <option value="maintenance" <%= catway.catwayState === 'maintenance' ? 'selected' : '' %>>Maintenance</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="/catways" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<script>
+function submitForm(event) {
+    event.preventDefault();
+    
+    const formData = {
+        catwayState: document.getElementById('catwayState').value
+    };
+
+    fetch('/api/catways/<%= catway._id %>', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.href = '/catways';
+        } else {
+            throw new Error(data.message || 'Erreur lors de la modification');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert(error.message || 'Erreur lors de la modification du catway');
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>

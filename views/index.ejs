@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Bienvenue sur Port Manager</h1>
+            <p class="lead">Application de gestion de port de plaisance</p>
+            <p>Gérez facilement vos catways, réservations et utilisateurs.</p>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Connexion</h2>
+                    <form method="POST" action="/api/login">
+                        <div class="mb-3">
+                            <label for="email">Email</label>
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email" 
+                                value="admin@port.com"
+                                required
+                            >
+                        </div>
+                        <div class="mb-3">
+                            <label for="password">Mot de passe</label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="password" 
+                                name="password" 
+                                value="admin123"
+                                required
+                            >
+                        </div>
+                        <button type="submit" class="btn btn-primary">Connexion</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

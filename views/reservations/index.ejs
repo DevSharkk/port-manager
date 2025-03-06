@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestion des Réservations</h1>
+        <a href="/reservations/create" class="btn btn-primary">Nouvelle Réservation</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Catway</th>
+                    <th>Client</th>
+                    <th>Bateau</th>
+                    <th>Début</th>
+                    <th>Fin</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% reservations.forEach(function(reservation) { %>
+                    <tr>
+                        <td><%= reservation.catwayNumber %></td>
+                        <td><%= reservation.clientName %></td>
+                        <td><%= reservation.boatName %></td>
+                        <td><%= new Date(reservation.startDate).toLocaleDateString('fr-FR') %></td>
+                        <td><%= new Date(reservation.endDate).toLocaleDateString('fr-FR') %></td>
+                        <td><%= reservation.status %></td>
+                        <td>
+                            <a href="/reservations/<%= reservation._id %>/edit" class="btn btn-sm btn-warning">Modifier</a>
+                            <button onclick="deleteReservation('<%= reservation._id %>')" class="btn btn-sm btn-danger">Supprimer</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function deleteReservation(id) {
+    if(confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?')) {
+        fetch(`/api/catways/${reservation.catwayNumber}/reservations/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+
+<%- include('../partials/footer') %>

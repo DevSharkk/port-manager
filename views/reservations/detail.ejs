@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Détails de la réservation</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Catway numéro :</strong> <%= reservation.catwayNumber %></p>
+                    <p><strong>Client :</strong> <%= reservation.clientName %></p>
+                    <p><strong>Bateau :</strong> <%= reservation.boatName %></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Date de début :</strong> <%= new Date(reservation.startDate).toLocaleDateString('fr-FR') %></p>
+                    <p><strong>Date de fin :</strong> <%= new Date(reservation.endDate).toLocaleDateString('fr-FR') %></p>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="/reservations/<%= reservation._id %>/edit" class="btn btn-warning">Modifier</a>
+                <button onclick="deleteReservation('<%= reservation._id %>')" class="btn btn-danger">Supprimer</button>
+                <a href="/dashboard" class="btn btn-secondary">Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteReservation(id) {
+    if(confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?')) {
+        fetch(`/api/catways/${reservation.catwayNumber}/reservations/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                window.location.href = '/dashboard';
+            }
+        });
+    }
+}
+</script>
+
+<%- include('../partials/footer') %> 
