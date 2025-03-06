@@ -52,10 +52,11 @@ router.get('/users/:email/edit', isAuthenticated, async (req, res) => {
 // Route d'accueil
 router.get('/', (req, res) => {
     if (req.session.user) {
-        res.redirect('/dashboard');
-    } else {
-        res.render('index');
+        return res.redirect('/dashboard');
     }
+    
+    const error = req.query.error;
+    res.render('index', { error });
 });
 
 // Route dashboard et autres routes existantes...

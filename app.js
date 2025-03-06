@@ -7,6 +7,7 @@ const flash = require('connect-flash');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./config/swagger');
+const MongoStore = require('connect-mongo');
 
 // Importation des fichiers de routes
 const catwaysRoutes = require('./routes/catways');
@@ -24,11 +25,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Configuration des sessions
+// Configuration des sessions avec stockage MongoDB
 app.use(session({
     secret: process.env.SESSION_SECRET || 'secret_key',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.DB_URI,
+        ttl: 24 * 60 * 60 // 1 jour en secondes
+    }),
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000 // 24 heures

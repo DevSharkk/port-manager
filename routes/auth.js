@@ -10,30 +10,21 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
         
         if (!email || !password) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Email et mot de passe requis'
-            });
+            return res.redirect('/?error=Veuillez remplir tous les champs');
         }
         
         const user = await User.findOne({ email });
         console.log('Utilisateur trouvé:', user);
         
         if (!user) {
-            return res.status(401).json({
-                status: 'error',
-                message: 'Email ou mot de passe incorrect'
-            });
+            return res.redirect('/?error=Email ou mot de passe incorrect');
         }
         
         const isValid = await bcrypt.compare(password, user.password);
         console.log('Mot de passe valide:', isValid);
         
         if (!isValid) {
-            return res.status(401).json({
-                status: 'error',
-                message: 'Email ou mot de passe incorrect'
-            });
+            return res.redirect('/?error=Email ou mot de passe incorrect');
         }
         
         // Créer la session
@@ -46,19 +37,12 @@ router.post('/login', async (req, res) => {
         
         console.log('Session utilisateur créée:', req.session.user);
         
-        // Répondre avec un JSON au lieu de rediriger
-        return res.status(200).json({
-            status: 'success',
-            message: 'Connexion réussie',
-            redirect: '/dashboard'
-        });
+        // Redirection directe
+        return res.redirect('/dashboard');
         
     } catch (error) {
         console.error('Erreur de connexion:', error);
-        res.status(500).json({
-            status: 'error',
-            message: 'Erreur lors de la connexion'
-        });
+        return res.redirect('/?error=Erreur lors de la connexion');
     }
 });
 

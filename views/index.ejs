@@ -11,7 +11,7 @@
             <div class="card">
                 <div class="card-body">
                     <h2 class="card-title">Connexion</h2>
-                    <form id="loginForm" class="mt-4">
+                    <form action="/api/login" method="POST" class="mt-4">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" name="email" required>
@@ -22,41 +22,16 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Connexion</button>
                     </form>
+
+                    <% if (typeof error !== 'undefined') { %>
+                        <div class="alert alert-danger mt-3">
+                            <%= error %>
+                        </div>
+                    <% } %>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    fetch('/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: 'same-origin' // Important pour les cookies de session
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Réponse:', data);
-        if (data.status === 'success') {
-            window.location.href = data.redirect || '/dashboard';
-        } else {
-            alert(data.message || 'Erreur de connexion');
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        alert('Erreur de connexion');
-    });
-});
-</script>
 
 <%- include('partials/footer') %>
