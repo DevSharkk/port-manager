@@ -59,7 +59,12 @@ router.get('/', (req, res) => {
     res.render('index', { error });
 });
 
-// Route dashboard et autres routes existantes...
+/**
+ * Tableau de bord de l'utilisateur connecté
+ * @route GET /dashboard
+ * @returns {View} Tableau de bord avec toutes les réservations
+ * @security Session
+ */
 router.get('/dashboard', async (req, res) => {
     try {
         console.log('Accès au dashboard, session:', req.session);
@@ -70,14 +75,13 @@ router.get('/dashboard', async (req, res) => {
             return res.redirect('/');
         }
         
-        // Récupérer les réservations actives
-        const today = new Date();
-        const reservations = await Reservation.find({
-            endDate: { $gte: today }
-        }).sort({ startDate: 1 });
+        // Récupérer toutes les réservations sans filtre de date
+        const reservations = await Reservation.find()
+            .sort({ startDate: -1 }); // Tri par date de début décroissante (les plus récentes d'abord)
         
-        console.log('Rendu du dashboard pour:', req.session.user.email);
-        console.log('Nombre de réservations trouvées:', reservations.length);
+        console.log('Nombre total de réservations trouvées:', reservations.length);
+        
+        const today = new Date();
         
         res.render('dashboard', { 
             currentUser: req.session.user,
