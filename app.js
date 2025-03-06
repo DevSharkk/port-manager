@@ -9,9 +9,9 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./config/swagger');
 
 // Importation des fichiers de routes
-const catwaysRoutes = require('./routes/catways'); // Routes pour les catways
-const reservationsRoutes = require('./routes/reservations'); // Routes pour les réservations
-const usersRoutes = require('./routes/users'); // Routes pour les utilisateurs
+const catwaysRoutes = require('./routes/catways');
+const reservationsRoutes = require('./routes/reservations');
+const usersRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const viewRoutes = require('./routes/viewRoutes');
 
@@ -39,52 +39,55 @@ app.use(flash());
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
-// Définition des routes
-app.use('/api/catways', catwaysRoutes);     // Route catways
-app.use('/api', reservationsRoutes);     // Enlever le préfixe /reservations car il est dans les routes
-app.use('/api/users', usersRoutes);         // Route users
+// Routes API - Toutes regroupées ensemble
+app.use('/api/catways', catwaysRoutes);
+app.use('/api', reservationsRoutes);
 app.use('/api', authRoutes);
+app.use('/api/users', usersRoutes);
+
+// Routes Views
 app.use('/', viewRoutes);
 
-// Options personnalisées pour Swagger UI
+// Configuration Swagger
 const swaggerOptions = {
-  customCss: '.swagger-ui .topbar { display: none } .custom-button { background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 10px; display: inline-block; }',
-  customSiteTitle: "API Port Manager",
-  customfavIcon: "/assets/favicon.ico",
-  customJs: '/custom.js'
+    customCss: '.swagger-ui .topbar { display: none } .custom-button { background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 10px; display: inline-block; }',
+    customSiteTitle: "API Port Manager",
+    customfavIcon: "/assets/favicon.ico",
+    customJs: '/custom.js'
 };
 
-// Ajouter le middleware pour le bouton de retour
+// Middleware pour le bouton de retour Swagger
 app.use('/api-docs', (req, res, next) => {
-  const customHTML = `
-    <div style="padding: 20px; background: #f8f9fa;">
-      <a href="/dashboard" class="custom-button">Retour au Tableau de Bord</a>
-    </div>
-  `;
-  res.send = ((send) => (body) => {
-    if (typeof body === 'string') {
-      body = body.replace('<body>', '<body>' + customHTML);
-    }
-    send.call(res, body);
-  })(res.send);
-  next();
+    const customHTML = `
+        <div style="padding: 20px; background: #f8f9fa;">
+            <a href="/dashboard" class="custom-button">Retour au Tableau de Bord</a>
+        </div>
+    `;
+    res.send = ((send) => (body) => {
+        if (typeof body === 'string') {
+            body = body.replace('<body>', '<body>' + customHTML);
+        }
+        send.call(res, body);
+    })(res.send);
+    next();
 });
 
+// Route Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, swaggerOptions));
 
-// Configuration et connexion à la base de données MongoDB
+// Configuration et connexion MongoDB
 mongoose.connect(process.env.DB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  // Message de succès si la connexion est établie
-  console.log("✅ Connecté à MongoDB !");
-}).catch(err => {
-  // Message d'erreur si la connexion échoue
-  console.error("❌ Erreur de connexion à MongoDB :", err);
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => {
+    console.log("✅ Connecté à MongoDB !");
+})
+.catch(err => {
+    console.error("❌ Erreur de connexion à MongoDB :", err);
 });
 
 // Démarrage du serveur
 app.listen(PORT, () => {
-  console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
+    console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
 });

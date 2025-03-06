@@ -13,7 +13,7 @@
 
         <div class="mb-3">
             <label for="catwayType" class="form-label">Type</label>
-            <input type="text" class="form-control" id="catwayType" name="catwayType" 
+            <input type="text" class="form-control" id="catwayType" 
                    value="<%= catway.catwayType %>" readonly>
         </div>
 
@@ -46,17 +46,16 @@ function submitForm(event) {
         },
         body: JSON.stringify(formData)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
+    .then(response => {
+        if (response.ok) {
             window.location.href = '/catways';
         } else {
-            throw new Error(data.message || 'Erreur lors de la modification');
+            throw new Error('Erreur lors de la modification');
         }
     })
     .catch(error => {
         console.error('Erreur:', error);
-        alert(error.message || 'Erreur lors de la modification du catway');
+        alert('Erreur lors de la modification du catway');
     });
 }
 </script>

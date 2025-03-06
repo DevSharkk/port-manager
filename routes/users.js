@@ -51,7 +51,7 @@ const SECRET_KEY = 'monsecret'; // À mettre dans un fichier `.env`
 // GET /users - Liste tous les utilisateurs
 router.get('/', async (req, res) => {
   try {
-    const users = await User.find().select('-password'); // Exclut le mot de passe
+    const users = await User.find({}, { password: 0 });
     res.status(200).json({
       status: 'success',
       results: users.length,
@@ -94,31 +94,59 @@ router.get('/:email', async (req, res) => {
 // POST /users - Crée un nouvel utilisateur
 router.post('/', async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    
-    const newUser = new User({
+    console.log('Données reçues dans la route POST:', req.body); // Debug
+
+    if (!req.body.username || !req.body.email || !req.body.password) {
+      console.log('Données manquantes:', { 
+        username: !!req.body.username, 
+        email: !!req.body.email, 
+        password: !!req.body.password 
+      }); // Debug
+      return res.status(400).json({
+        status: 'error',
+        message: 'Tous les champs sont requis'
+      });
+    }
+
+    // Vérifier si l'email existe déjà
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      console.log('Email déjà existant:', req.body.email); // Debug
+      return res.status(400).json({
+        status: 'error',
+        message: 'Cet email est déjà utilisé'
+      });
+    }
+
+    // Vérifier si le nom d'utilisateur existe déjà
+    const existingUsername = await User.findOne({ username: req.body.username });
+    if (existingUsername) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Ce nom d\'utilisateur est déjà utilisé'
+      });
+    }
+
+    // Créer le nouvel utilisateur
+    const user = new User({
+      username: req.body.username,
       email: req.body.email,
-      password: hashedPassword,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      role: req.body.role || 'user'
+      password: req.body.password
     });
-    
-    await newUser.save();
-    
-    const userWithoutPassword = { ...newUser.toObject() };
-    delete userWithoutPassword.password;
-    
+
+    await user.save();
+    console.log('Utilisateur créé avec succès'); // Debug
+
     res.status(201).json({
       status: 'success',
-      message: 'Utilisateur créé avec succès',
-      data: userWithoutPassword
+      message: 'Utilisateur créé avec succès'
     });
+
   } catch (error) {
+    console.error('Erreur création utilisateur:', error);
     res.status(500).json({
       status: 'error',
-      message: 'Erreur lors de la création de l\'utilisateur',
-      error: error.message
+      message: error.message || 'Erreur lors de la création de l\'utilisateur'
     });
   }
 });
@@ -126,16 +154,18 @@ router.post('/', async (req, res) => {
 // PUT /users/:email - Modifie un utilisateur
 router.put('/:email', async (req, res) => {
   try {
+    const updateData = {};
+    if (req.body.username) updateData.username = req.body.username;
     if (req.body.password) {
-      req.body.password = await bcrypt.hash(req.body.password, 10);
+      updateData.password = await bcrypt.hash(req.body.password, 10);
     }
-    
+
     const user = await User.findOneAndUpdate(
       { email: req.params.email },
-      req.body,
-      { new: true }
-    ).select('-password');
-    
+      updateData,
+      { new: true, runValidators: true }
+    );
+
     if (!user) {
       return res.status(404).json({
         status: 'error',

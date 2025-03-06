@@ -1,0 +1,66 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <h1>Modifier l'Utilisateur</h1>
+
+    <form id="editUserForm" onsubmit="submitForm(event)">
+        <div class="mb-3">
+            <label for="username" class="form-label">Nom d'utilisateur</label>
+            <input type="text" class="form-control" id="username" name="username" 
+                   value="<%= user.username %>" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" 
+                   value="<%= user.email %>" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Nouveau mot de passe (optionnel)</label>
+            <input type="password" class="form-control" id="password" name="password">
+            <small class="text-muted">Laissez vide pour garder le même mot de passe</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="/users" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<script>
+function submitForm(event) {
+    event.preventDefault();
+    
+    const formData = {
+        username: document.getElementById('username').value
+    };
+
+    const password = document.getElementById('password').value;
+    if (password) {
+        formData.password = password;
+    }
+
+    fetch('/api/users/<%= user.email %>', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === 'success') {
+            window.location.href = '/users';
+        } else {
+            alert(data.message || 'Erreur lors de la modification');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la modification de l\'utilisateur');
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>

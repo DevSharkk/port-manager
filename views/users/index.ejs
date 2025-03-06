@@ -11,26 +11,28 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Nom</th>
-                    <th>Prénom</th>
+                    <th>Nom d'utilisateur</th>
                     <th>Email</th>
-                    <th>Rôle</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <% users.forEach(function(user) { %>
+                <% if (users && users.length > 0) { %>
+                    <% users.forEach(function(user) { %>
+                        <tr>
+                            <td><%= user.username %></td>
+                            <td><%= user.email %></td>
+                            <td>
+                                <a href="/users/<%= user.email %>/edit" class="btn btn-sm btn-warning">Modifier</a>
+                                <button onclick="deleteUser('<%= user.email %>')" class="btn btn-sm btn-danger">Supprimer</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
                     <tr>
-                        <td><%= user.lastName %></td>
-                        <td><%= user.firstName %></td>
-                        <td><%= user.email %></td>
-                        <td><%= user.role %></td>
-                        <td>
-                            <a href="/users/<%= user.email %>/edit" class="btn btn-sm btn-warning">Modifier</a>
-                            <button onclick="deleteUser('<%= user.email %>')" class="btn btn-sm btn-danger">Supprimer</button>
-                        </td>
+                        <td colspan="3" class="text-center">Aucun utilisateur trouvé</td>
                     </tr>
-                <% }); %>
+                <% } %>
             </tbody>
         </table>
     </div>
@@ -45,8 +47,14 @@ function deleteUser(email) {
         .then(response => response.json())
         .then(data => {
             if(data.status === 'success') {
-                location.reload();
+                window.location.reload();
+            } else {
+                alert(data.message || 'Erreur lors de la suppression');
             }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la suppression de l\'utilisateur');
         });
     }
 }

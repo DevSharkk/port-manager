@@ -1,19 +1,64 @@
 const express = require('express');
 const router = express.Router();
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
-const Catway = require('../models/Catway');
-const Reservation = require('../models/Reservation');
 const User = require('../models/User');
+const Reservation = require('../models/Reservation');
+const Catway = require('../models/Catway');
 
-// Page d'accueil (login)
-router.get('/', (req, res) => {
-    res.render('index', {
-        error: req.flash('error'),
-        success: req.flash('success')
+// Middleware d'authentification
+const isAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/');
+    }
+};
+
+// Routes pour les utilisateurs (AVANT les autres routes)
+router.get('/users', isAuthenticated, async (req, res) => {
+    try {
+        const users = await User.find({}, { password: 0 });
+        res.render('users/index', { 
+            users,
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Erreur:', error);
+        res.redirect('/users');
+    }
+});
+
+router.get('/users/create', isAuthenticated, (req, res) => {
+    res.render('users/create', { 
+        currentUser: req.session.user
     });
 });
 
-// Dashboard
+router.get('/users/:email/edit', isAuthenticated, async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.params.email }, { password: 0 });
+        if (!user) {
+            return res.redirect('/users');
+        }
+        res.render('users/edit', { 
+            user,
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Erreur:', error);
+        res.redirect('/users');
+    }
+});
+
+// Route d'accueil
+router.get('/', (req, res) => {
+    if (req.session.user) {
+        res.redirect('/dashboard');
+    } else {
+        res.render('index');
+    }
+});
+
+// Route dashboard et autres routes existantes...
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
         // Récupérer toutes les réservations
@@ -95,7 +140,7 @@ router.get('/reservations/:id', isAuthenticated, async (req, res) => {
 });
 
 // Routes Utilisateurs (admin seulement)
-router.get('/users', isAdmin, async (req, res) => {
+router.get('/users', isAuthenticated, async (req, res) => {
     try {
         const users = await User.find().select('-password');
         res.render('users/index', { users });
@@ -104,8 +149,43 @@ router.get('/users', isAdmin, async (req, res) => {
     }
 });
 
-router.get('/users/create', isAdmin, (req, res) => {
+router.get('/users/create', isAuthenticated, (req, res) => {
     res.render('users/create');
+});
+
+// Route pour afficher le formulaire de création
+router.get('/users/create', (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.redirect('/');
+        }
+        res.render('users/create', { 
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Erreur:', error);
+        res.redirect('/users');
+    }
+});
+
+// Route pour afficher le formulaire de modification
+router.get('/users/:email/edit', async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.redirect('/');
+        }
+        const user = await User.findOne({ email: req.params.email }, { password: 0 });
+        if (!user) {
+            return res.redirect('/users');
+        }
+        res.render('users/edit', { 
+            user,
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Erreur:', error);
+        res.redirect('/users');
+    }
 });
 
 module.exports = router; 

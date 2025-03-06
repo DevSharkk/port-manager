@@ -1,0 +1,69 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container mt-4">
+    <h1>Nouvel Utilisateur</h1>
+
+    <form id="createUserForm" onsubmit="submitForm(event)">
+        <div class="mb-3">
+            <label for="username" class="form-label">Nom d'utilisateur</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+            <small class="text-muted">Minimum 8 caractères</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Créer</button>
+        <a href="/users" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<script>
+function submitForm(event) {
+    event.preventDefault();
+    console.log('Formulaire soumis'); // Debug
+    
+    const formData = {
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+    };
+    
+    console.log('Données à envoyer:', formData); // Debug
+
+    fetch('/api/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        console.log('Status:', response.status); // Debug
+        return response.json();
+    })
+    .then(data => {
+        console.log('Réponse:', data); // Debug
+        if(data.status === 'success') {
+            alert('Utilisateur créé avec succès');
+            window.location.href = '/users'; // Changé de /dashboard à /users
+        } else {
+            throw new Error(data.message || 'Erreur lors de la création');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la création de l\'utilisateur: ' + error.message);
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>
