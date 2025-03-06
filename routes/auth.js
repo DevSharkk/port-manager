@@ -10,6 +10,7 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
         
         if (!email || !password) {
+            console.log('Champs manquants');
             return res.redirect('/?error=Veuillez remplir tous les champs');
         }
         
@@ -17,6 +18,7 @@ router.post('/login', async (req, res) => {
         console.log('Utilisateur trouvé:', user);
         
         if (!user) {
+            console.log('Utilisateur non trouvé');
             return res.redirect('/?error=Email ou mot de passe incorrect');
         }
         
@@ -24,6 +26,7 @@ router.post('/login', async (req, res) => {
         console.log('Mot de passe valide:', isValid);
         
         if (!isValid) {
+            console.log('Mot de passe invalide');
             return res.redirect('/?error=Email ou mot de passe incorrect');
         }
         
@@ -37,8 +40,16 @@ router.post('/login', async (req, res) => {
         
         console.log('Session utilisateur créée:', req.session.user);
         
-        // Redirection directe
-        return res.redirect('/dashboard');
+        // Sauvegarder explicitement la session
+        req.session.save(err => {
+            if (err) {
+                console.error('Erreur sauvegarde session:', err);
+                return res.redirect('/?error=Erreur lors de la connexion');
+            }
+            
+            console.log('Session sauvegardée, redirection vers /dashboard');
+            return res.redirect('/dashboard');
+        });
         
     } catch (error) {
         console.error('Erreur de connexion:', error);

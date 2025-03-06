@@ -60,20 +60,21 @@ router.get('/', (req, res) => {
 });
 
 // Route dashboard et autres routes existantes...
-router.get('/dashboard', isAuthenticated, async (req, res) => {
-    try {
-        // Récupérer toutes les réservations
-        const reservations = await Reservation.find();
-        console.log('Réservations trouvées:', reservations); // Pour déboguer
-
-        res.render('dashboard', {
-            user: req.session.user,
-            reservations: reservations
-        });
-    } catch (error) {
-        console.error('Erreur:', error);
-        res.redirect('/');
+router.get('/dashboard', (req, res) => {
+    console.log('Accès au dashboard, session:', req.session);
+    console.log('Utilisateur en session:', req.session.user);
+    
+    if (!req.session.user) {
+        console.log('Pas d\'utilisateur en session, redirection vers /');
+        return res.redirect('/');
     }
+    
+    // Reste du code...
+    console.log('Rendu du dashboard pour:', req.session.user.email);
+    res.render('dashboard', { 
+        currentUser: req.session.user,
+        // Autres données...
+    });
 });
 
 // Routes Catways
