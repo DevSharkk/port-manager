@@ -35,7 +35,7 @@ app.use(session({
         ttl: 24 * 60 * 60 // 1 jour en secondes
     }),
     cookie: { 
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         maxAge: 24 * 60 * 60 * 1000 // 24 heures
     }
 }));
@@ -93,6 +93,12 @@ mongoose.connect(process.env.DB_URI, {
 })
 .catch(err => {
     console.error("❌ Erreur de connexion à MongoDB :", err);
+});
+
+// Ajouter après les autres middlewares
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store');
+    next();
 });
 
 // Démarrage du serveur
