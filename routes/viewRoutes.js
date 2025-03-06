@@ -60,21 +60,34 @@ router.get('/', (req, res) => {
 });
 
 // Route dashboard et autres routes existantes...
-router.get('/dashboard', (req, res) => {
-    console.log('Accès au dashboard, session:', req.session);
-    console.log('Utilisateur en session:', req.session.user);
-    
-    if (!req.session.user) {
-        console.log('Pas d\'utilisateur en session, redirection vers /');
-        return res.redirect('/');
+router.get('/dashboard', async (req, res) => {
+    try {
+        console.log('Accès au dashboard, session:', req.session);
+        console.log('Utilisateur en session:', req.session.user);
+        
+        if (!req.session.user) {
+            console.log('Pas d\'utilisateur en session, redirection vers /');
+            return res.redirect('/');
+        }
+        
+        // Récupérer les réservations actives
+        const today = new Date();
+        const reservations = await Reservation.find({
+            endDate: { $gte: today }
+        }).sort({ startDate: 1 });
+        
+        console.log('Rendu du dashboard pour:', req.session.user.email);
+        console.log('Nombre de réservations trouvées:', reservations.length);
+        
+        res.render('dashboard', { 
+            currentUser: req.session.user,
+            reservations: reservations,
+            today: today
+        });
+    } catch (error) {
+        console.error('Erreur dashboard:', error);
+        res.status(500).send('Erreur serveur. Veuillez réessayer plus tard.');
     }
-    
-    // Reste du code...
-    console.log('Rendu du dashboard pour:', req.session.user.email);
-    res.render('dashboard', { 
-        currentUser: req.session.user,
-        // Autres données...
-    });
 });
 
 // Routes Catways
